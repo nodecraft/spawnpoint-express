@@ -1,0 +1,7 @@
+{
+	"server.status_404": "File not found.",
+	"server.status_401": "Unauthorized request. Please authenticate.",
+	"server.status_407": "Proxy authentication required.",
+	"server.generic_error": "Internal server error.",
+	"server.validation": "There was a problem with your request. Please check the errors provided."
+}

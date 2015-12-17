@@ -1,0 +1,27 @@
+{
+  "name": "appframe-express",
+  "version": "0.1.0",
+  "description": "Express plugin for appframe.js NPM module",
+  "main": "appframe-express.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodecraft/appframe-express.js.git"
+  },
+  "keywords": [
+    "express",
+    "appframe"
+  ],
+  "author": "NodeCraft Hosting LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nodecraft/appframe-express.js/issues"
+  },
+  "homepage": "https://github.com/nodecraft/appframe-express.js#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "lodash": "^3.10.1"
+  }
+}

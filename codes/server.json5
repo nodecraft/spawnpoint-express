@@ -1,7 +1,36 @@
 {
-	"server.status_404": "File not found.",
-	"server.status_401": "Unauthorized request. Please authenticate.",
-	"server.status_407": "Proxy authentication required.",
 	"server.generic_error": "Internal server error.",
 	"server.validation": "There was a problem with your request. Please check the errors provided."
+
+	"server.status_200": "Request successful.",
+	"server.status_201": "Request successfully received and resource was created.",
+	"server.status_202": "Request successfully received and is being processed.",
+	"server.status_204": "Request successfully received and has no response.",
+
+	"server.status_301": "Resource moved permanantly.",
+	"server.status_302": "Resource found and moved temporarily.",
+	"server.status_307": "Resource moved temporarily.",
+
+	"server.status_400": "Bad request.",
+	"server.status_401": "Unauthorized request. Please authenticate.",
+	"server.status_403": "This request is forbidden.",
+	"server.status_404": "File not found.",
+	"server.status_405": "Method not allowed.",
+	"server.status_406": "The requested content cannot be provided in the requested content type.",
+	"server.status_407": "Proxy authentication required.",
+	"server.status_410": "Resource is no longer available.",
+	"server.status_413": "Request payload is too large.",
+	"server.status_414": "Request URI is too long.",
+	"server.status_418": "I'm a teapot.",
+	"server.status_420": "Enhance your calm.",
+	"server.status_429": "Too many requests, you are being rate limited.",
+	"server.status_451": "Requested content is being censored or legal reason.",
+
+	"server.status_500": "Internal server error.",
+	"server.status_501": "Request is not implemented.",
+	"server.status_502": "Server is too busy to handle your request.",
+	"server.status_503": "Service unavailable.",
+	"server.status_504": "Gateway timeout.",
+	"server.status_507": "Insufficient storage.",
+	"server.status_520": "Unknown error occured."
 }

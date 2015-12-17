@@ -1,14 +1,17 @@
 'use strict';
 var _ = require('lodash'),
-	express = require('express');
+	express = require('express'),
+	bodyParser = require('body-parser');
 
-module.exports = require('../appframe.js/appframe.js')().registerPlugin({
+module.exports = require('appframe')().registerPlugin({
 	dir: __dirname,
 	name: "Express",
 	namespace: "server",
 	callback: true,
 	exports: function(app, callback){
+		app.joi = require('joi');
 		app.server = express();
+
 		app.server.set('x-powered-by', false);
 
 		// setup express to handle error codes for better API responses
@@ -26,7 +29,6 @@ module.exports = require('../appframe.js/appframe.js')().registerPlugin({
 			if(checkError !== false){
 				response = checkError;
 			}else if(typeof(error) === 'string'){
-				console.log('string error', err);
 				response = app.code(error);
 			}else if(error instanceof app._failCode){
 				response = _.pick(error, ['message', 'code', 'data']);
@@ -61,7 +63,8 @@ module.exports = require('../appframe.js/appframe.js')().registerPlugin({
 			return callback(err);
 		});
 		// track clients to gracefully close server
-		var clients = {};
+		var clients = {},
+			requests = {};
 		app.httpServer.on('error', function(err){
 			app.error('HTTP server error').debug(err);
 		});
@@ -76,18 +79,105 @@ module.exports = require('../appframe.js/appframe.js')().registerPlugin({
 			app.httpServer.close(function(){
 				app.emit('app.deregister', 'express');
 			});
-			_.each(clients, function(client){
-				client.destroy();
-			});
+			var lastCount = null;
+			var attemptClose = function(){
+				var openReqs =  Object.keys(requests).length;
+				if(lastCount !== null && lastCount === openReqs){
+					return;
+				}
+				lastCount = openReqs;
+				if(openReqs < 1){
+					_.each(clients, function(client){
+						client.destroy();
+					});
+				}else{
+					app.info('Waiting on %s request(s) to complete', openReqs);
+				}
+			};
+			app.on('server.request_finish', attemptClose);
+			attemptClose();
 		});
-		app.emit('app.server_middleware');
-		if(app.config.debug){
-			app.server.use(function(req, res, next){
-				app.info('REQ: ' +  req.originalUrl);
-				return next();
+
+		// setup body parsers
+		if(app.config.server.bodyParser){
+			_.each(app.config.server.bodyParser, function(opts, key){
+				app.info('Enabling body parser: %s.', key);
+				app.server.use(bodyParser[key](opts));
 			});
 		}
-		if(app.config.server.handle_error){
+
+		// setup validation errors
+		var fieldRegex = new RegExp("(" + app.config.server.validation.dataTypes.join('|') + ")\\.(.*)");
+		app.server.validate = function(schema, options){
+			options = options || {};
+			options = _.defaults(options, app.config.server.validation.options);
+			return function(req, res, next){
+				var data = {};
+				app.config.server.validation.dataTypes.forEach(function(type){
+					if(_.keys(req[type]).length > 0){
+						data[type] = req[type];
+					}
+				});
+				app.joi.validate(data, schema, options, function(err, results){
+					if(err){
+						var errors = {};
+						err.details.forEach(function(item){
+							var name = fieldRegex.exec(item.path);
+							if(name && name[1] && name[2]){
+								errors[name[2]] = {
+									message: item.message,
+									type: item.type
+								};
+							}
+						});
+						// catch validation
+						return res.status(400).fail('server.validation', {
+							fields: errors
+						});
+					}
+					_.each(results, function(value, key){
+						req[key] = value;
+					});
+					return next();
+				});
+			}
+		}
+		app.server.use(function(req, res, next){
+			res.invalid = function(fields){
+				var errors = {};
+				_.each(fields, function(message, field){
+					errors[field] = {
+						type: 'custom_message',
+						message: typeof(message) == 'object' && message.message || message
+					};
+				});
+				return res.status(400).fail('server.validation', {
+					fields: errors
+				});
+			}
+			return next();
+		});
+
+		// track requests open/close
+		app.server.use(function(req, res, next){
+			req.id = app.random(128) + '-' + req.originalUrl;
+			requests[req.id] = true;
+			app.emit('server.request_open', req.id);
+			if(app.config.debug){
+				app.info('> REQ: ' +  req.originalUrl, req.id);
+			}
+			var cleanup = function(){
+				delete requests[req.id];
+				app.emit('server.request_finish', req.id);
+			};
+			res.on('finish', cleanup);
+			res.on('close', cleanup);
+			return next();
+		});
+		app.on('server.middleware', function(fn){
+			app.server.use(fn);
+		});
+		if(app.config.server.handleError){
 			app.on('app.ready', function(){
 				app.server.use(function(err, req, res, next){
 					if(err){

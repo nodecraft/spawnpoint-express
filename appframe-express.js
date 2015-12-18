@@ -162,13 +162,13 @@ module.exports = require('appframe')().registerPlugin({
 		app.server.use(function(req, res, next){
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
-			app.emit('express.request_open', req.id);
+			app.emit('express.request_open', req);
 			if(app.config.debug){
 				app.info('> REQ: ' +  req.originalUrl, req.id);
 			}
 			var cleanup = function(){
 				delete requests[req.id];
-				app.emit('express.request_finish', req.id);
+				app.emit('express.request_finish', req);
 			};
 			res.on('finish', cleanup);
 			res.on('close', cleanup);

@@ -1,6 +1,6 @@
 {
 	"server.generic_error": "Internal server error.",
-	"server.validation": "There was a problem with your request. Please check the errors provided."
+	"server.validation": "There was a problem with your request. Please check the errors provided.",
 
 	"server.status_200": "Request successful.",
 	"server.status_201": "Request successfully received and resource was created.",

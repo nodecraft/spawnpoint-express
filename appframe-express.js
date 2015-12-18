@@ -6,7 +6,7 @@ var _ = require('lodash'),
 module.exports = require('appframe')().registerPlugin({
 	dir: __dirname,
 	name: "Express",
-	namespace: "server",
+	namespace: "express",
 	callback: true,
 	exports: function(app, callback){
 		app.joi = require('joi');
@@ -54,7 +54,7 @@ module.exports = require('appframe')().registerPlugin({
 
 
 		// register express with appframe
-		app.httpServer = app.server.listen(app.config.server.port, app.config.server.host, function(err){
+		app.httpServer = app.server.listen(app.config.express.port, app.config.express.host, function(err){
 			if(!err){
 				var address = app.httpServer.address();
 				app.info('Server online at %s:%s', address.address, address.port);
@@ -99,21 +99,21 @@ module.exports = require('appframe')().registerPlugin({
 		});
 
 		// setup body parsers
-		if(app.config.server.bodyParser){
-			_.each(app.config.server.bodyParser, function(opts, key){
+		if(app.config.express.bodyParser){
+			_.each(app.config.express.bodyParser, function(opts, key){
 				app.info('Enabling body parser: %s.', key);
 				app.server.use(bodyParser[key](opts));
 			});
 		}
 
 		// setup validation errors
-		var fieldRegex = new RegExp("(" + app.config.server.validation.dataTypes.join('|') + ")\\.(.*)");
+		var fieldRegex = new RegExp("(" + app.config.express.validation.dataTypes.join('|') + ")\\.(.*)");
 		app.server.validate = function(schema, options){
 			options = options || {};
-			options = _.defaults(options, app.config.server.validation.options);
+			options = _.defaults(options, app.config.express.validation.options);
 			return function(req, res, next){
 				var data = {};
-				app.config.server.validation.dataTypes.forEach(function(type){
+				app.config.express.validation.dataTypes.forEach(function(type){
 					if(_.keys(req[type]).length > 0){
 						data[type] = req[type];
 					}
@@ -177,7 +177,7 @@ module.exports = require('appframe')().registerPlugin({
 		app.on('server.middleware', function(fn){
 			app.server.use(fn);
 		});
-		if(app.config.server.handleError){
+		if(app.config.express.handleError){
 			app.on('app.ready', function(){
 				app.server.use(function(err, req, res, next){
 					if(err){

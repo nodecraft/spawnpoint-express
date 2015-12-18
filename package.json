@@ -1,6 +1,6 @@
 {
   "name": "appframe-express",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Express plugin for appframe.js NPM module",
   "main": "appframe-express.js",
   "scripts": {

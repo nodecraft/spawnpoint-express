@@ -24,7 +24,7 @@ module.exports = require('appframe')().registerPlugin({
 			return this.json(response);
 		}
 		app.server.response.fail = function(error, data){
-			var response = app.code('server.generic_error'),
+			var response = app.code('express.generic_error'),
 				checkError = app.maskErrorToCode(error);
 			if(checkError !== false){
 				response = checkError;
@@ -94,7 +94,7 @@ module.exports = require('appframe')().registerPlugin({
 					app.info('Waiting on %s request(s) to complete', openReqs);
 				}
 			};
-			app.on('server.request_finish', attemptClose);
+			app.on('express.request_finish', attemptClose);
 			attemptClose();
 		});
 
@@ -131,7 +131,7 @@ module.exports = require('appframe')().registerPlugin({
 							}
 						});
 						// catch validation
-						return res.status(400).fail('server.validation', {
+						return res.status(400).fail('express.validation', {
 							fields: errors
 						});
 					}
@@ -151,7 +151,7 @@ module.exports = require('appframe')().registerPlugin({
 						message: typeof(message) == 'object' && message.message || message
 					};
 				});
-				return res.status(400).fail('server.validation', {
+				return res.status(400).fail('express.validation', {
 					fields: errors
 				});
 			}
@@ -162,19 +162,19 @@ module.exports = require('appframe')().registerPlugin({
 		app.server.use(function(req, res, next){
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
-			app.emit('server.request_open', req.id);
+			app.emit('express.request_open', req.id);
 			if(app.config.debug){
 				app.info('> REQ: ' +  req.originalUrl, req.id);
 			}
 			var cleanup = function(){
 				delete requests[req.id];
-				app.emit('server.request_finish', req.id);
+				app.emit('express.request_finish', req.id);
 			};
 			res.on('finish', cleanup);
 			res.on('close', cleanup);
 			return next();
 		});
-		app.on('server.middleware', function(fn){
+		app.on('express.middleware', function(fn){
 			app.server.use(fn);
 		});
 		if(app.config.express.handleError){
@@ -191,7 +191,7 @@ module.exports = require('appframe')().registerPlugin({
 				});
 				app.server.use(function(req, res){
 					app.debug('404 request: %s', req.originalUrl);
-					return res.status(404).fail('server.status_404');
+					return res.status(404).fail('express.status_404');
 				});
 			});
 		}

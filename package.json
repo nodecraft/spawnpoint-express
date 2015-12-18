@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/nodecraft/appframe-express.js#readme",
   "dependencies": {
-    "appframe": "^0.3.3",
+    "appframe": "0.3.4",
     "body-parser": "1.14.2",
     "express": "4.13.3",
     "joi": "7.0.1",

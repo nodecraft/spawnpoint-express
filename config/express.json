@@ -9,7 +9,7 @@
 	// static folder mounting
 	"static": {
 		// "./path/to/folder": { ... }
-	}
+	},
 
 	"validation": {
 		// these request field types will be automatically parsed for validation

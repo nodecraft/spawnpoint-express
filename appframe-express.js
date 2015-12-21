@@ -1,4 +1,6 @@
 'use strict';
+var path = require('path');
+
 var _ = require('lodash'),
 	express = require('express'),
 	bodyParser = require('body-parser');
@@ -13,6 +15,11 @@ module.exports = require('appframe')().registerPlugin({
 		app.server = express();
 
 		app.server.set('x-powered-by', false);
+
+		// prevent cross site JSON
+		app.server.response.secureJSON = function(data){
+			return this.type('json').end(")]}',\n" + JSON.stringify(data));
+		}
 
 		// setup express to handle error codes for better API responses
 		app.server.response.success = function(code, data){
@@ -164,7 +171,7 @@ module.exports = require('appframe')().registerPlugin({
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
 			if(app.config.debug){
-				app.info('> REQ: ' +  req.originalUrl, req.id);
+				app.info('> ' + req.method + ': ' +  req.originalUrl);
 			}
 			var cleanup = function(){
 				delete requests[req.id];
@@ -174,6 +181,13 @@ module.exports = require('appframe')().registerPlugin({
 			res.on('close', cleanup);
 			return next();
 		});
+
+		if(app.config.express.static){
+			_.each(app.config.express.static, function(opts, folder){
+				app.server.use(express.static(path.join(app.cwd + folder), opts));
+			});
+		}
+
 		app.on('express.middleware', function(fn){
 			app.server.use(fn);
 		});

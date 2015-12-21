@@ -6,6 +6,11 @@
 	// disabling this will prevent 500 and 404 errors from being handled via JSON automatically
 	"handleError": true,
 
+	// static folder mounting
+	"static": {
+		// "./path/to/folder": { ... }
+	}
+
 	"validation": {
 		// these request field types will be automatically parsed for validation
 		"dataTypes": ["body", "query", "params"],

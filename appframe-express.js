@@ -3,7 +3,8 @@ var path = require('path');
 
 var _ = require('lodash'),
 	express = require('express'),
-	bodyParser = require('body-parser');
+	bodyParser = require('body-parser'),
+	helmet = require('helmet');
 
 module.exports = require('appframe')().registerPlugin({
 	dir: __dirname,
@@ -112,6 +113,19 @@ module.exports = require('appframe')().registerPlugin({
 				app.server.use(bodyParser[key](opts));
 			});
 		}
+		if(app.config.express.helmet){
+			if(typeof(helmet) === 'object'){
+				_.each(app.config.express.helmet, function(module, config){
+					if(!helmet[module]){ return app.error('Invalid helmet module [%s]', module); }
+					if(config === true){
+						return app.server.use(helmet[module]());
+					}
+					return app.server.use(helmet[module](config));
+				});
+			}else{
+				app.server.use(helmet());
+			}
+		}
 
 		// setup validation errors
 		var fieldRegex = new RegExp("(" + app.config.express.validation.dataTypes.join('|') + ")\\.(.*)");
@@ -120,6 +134,9 @@ module.exports = require('appframe')().registerPlugin({
 			options = _.defaults(options, app.config.express.validation.options);
 			return function(req, res, next){
 				var data = {};
+				_.each(schema, function(v, key){
+					data[key] = {};
+				});
 				app.config.express.validation.dataTypes.forEach(function(type){
 					if(_.keys(req[type]).length > 0){
 						data[type] = req[type];

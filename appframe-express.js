@@ -46,6 +46,8 @@ module.exports = require('appframe')().registerPlugin({
 				}
 				response = _.pick(error, ['message', 'code', 'data']);
 				response.error = true;
+			}else if(error && error.code !== undefined && error.message !== undefined && error.success !== undefined){
+				return this.json(error);
 			}else if(error && error.code){
 				response = app.code(error.code);
 			}

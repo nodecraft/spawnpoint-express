@@ -4,7 +4,8 @@ var path = require('path');
 var _ = require('lodash'),
 	express = require('express'),
 	bodyParser = require('body-parser'),
-	helmet = require('helmet');
+	helmet = require('helmet'),
+	compression = require('compression');
 
 module.exports = require('appframe')().registerPlugin({
 	dir: __dirname,
@@ -116,8 +117,11 @@ module.exports = require('appframe')().registerPlugin({
 			});
 		}
 		if(app.config.express.helmet){
-			if(typeof(helmet) === 'object'){
-				_.each(app.config.express.helmet, function(module, config){
+			if(typeof(app.config.express.helmet) === 'object'){
+				_.each(app.config.express.helmet, function(config, module){
+					if(config === false){
+						return;
+					}
 					if(!helmet[module]){ return app.error('Invalid helmet module [%s]', module); }
 					if(config === true){
 						return app.server.use(helmet[module]());
@@ -201,6 +205,13 @@ module.exports = require('appframe')().registerPlugin({
 			return next();
 		});
 
+		if(app.config.express.compression){
+			if(typeof(app.config.express.compression) === 'object'){
+				app.server.use(compression(app.config.express.compression));
+			}else{
+				app.server.use(compression());
+			}
+		}
 		if(app.config.express.static){
 			_.each(app.config.express.static, function(opts, folder){
 				app.server.use(express.static(path.join(app.cwd + folder), opts));

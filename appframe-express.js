@@ -63,16 +63,24 @@ module.exports = require('appframe')().registerPlugin({
 			return this.json(response);
 		}
 
-
 		// register express with appframe
-		app.httpServer = app.server.listen(app.config.express.port, app.config.express.host, function(err){
+		var ready = function(err){
 			if(!err){
 				var address = app.httpServer.address();
 				app.info('Server online at %s:%s', address.address, address.port);
 			}
 			app.emit('app.register', 'express');
 			return callback(err);
-		});
+		};
+		if(app.config.express.port && app.config.express.host){
+			app.httpServer = app.server.listen(app.config.express.port, app.config.express.host, ready);
+		}else if(app.config.express.port){
+			app.httpServer = app.server.listen(app.config.express.port, ready);
+		}else if(app.config.express.file){
+			app.httpServer = app.server.listen(app.config.express.file, ready);
+		}else{
+			throw new Error('No port, host, or file set to listen');
+		}
 		// track clients to gracefully close server
 		var clients = {},
 			requests = {};

@@ -1,5 +1,6 @@
 'use strict';
-var path = require('path');
+var path = require('path'),
+	fs = require('fs');
 
 var _ = require('lodash'),
 	express = require('express'),
@@ -67,7 +68,14 @@ module.exports = require('appframe')().registerPlugin({
 		var ready = function(err){
 			if(!err){
 				var address = app.httpServer.address();
-				app.info('Server online at %s:%s', address.address, address.port);
+
+				if(app.config.express.port){
+					app.info('Server online at %s:%s', address.address, address.port);
+				}else if(app.config.express.file){
+					app.info('Server online via %s', app.config.express.file);
+				}else{
+					app.info('Server online!');
+				}
 			}
 			app.emit('app.register', 'express');
 			return callback(err);
@@ -77,7 +85,14 @@ module.exports = require('appframe')().registerPlugin({
 		}else if(app.config.express.port){
 			app.httpServer = app.server.listen(app.config.express.port, ready);
 		}else if(app.config.express.file){
-			app.httpServer = app.server.listen(app.config.express.file, ready);
+			if(fs.existsSync(app.config.express.file)){
+			    fs.unlinkSync(app.config.express.file);
+			}
+			var mask = process.umask(0);
+			app.httpServer = app.server.listen(app.config.express.file, function(){
+				process.umask(mask);
+				ready();
+			});
 		}else{
 			throw new Error('No port, host, or file set to listen');
 		}

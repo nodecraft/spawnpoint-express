@@ -241,7 +241,7 @@ module.exports = require('appframe')().registerPlugin({
 			});
 		}
 
-		app.on('express.middleware', function(fn){
+		app.on('express.middleware', function(path, fn){
 			if(path && !fn){
 				return app.server.use(path);
 			}

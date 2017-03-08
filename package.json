@@ -1,6 +1,6 @@
 {
   "name": "appframe-express",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Express plugin for appframe.js NPM module",
   "main": "appframe-express.js",
   "scripts": {
@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/nodecraft/appframe-express.js#readme",
   "dependencies": {
-    "appframe": "0.4.1",
-    "body-parser": "1.16.0",
-    "express": "4.14.1",
-    "joi": "10.2.0",
-    "lodash": "4.17.4",
-    "helmet": "3.4.0",
+    "appframe": "*",
+    "body-parser": "1.17.1",
+    "express": "4.15.2",
+    "joi": "10.2.2",
+    "lodash": "*",
+    "helmet": "3.4.1",
     "compression": "1.6.2"
   }
 }

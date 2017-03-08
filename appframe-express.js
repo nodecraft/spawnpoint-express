@@ -242,7 +242,10 @@ module.exports = require('appframe')().registerPlugin({
 		}
 
 		app.on('express.middleware', function(fn){
-			app.server.use(fn);
+			if(path && !fn){
+				return app.server.use(path);
+			}
+			app.server.use(path, fn);
 		});
 		if(app.config.express.handleError){
 			app.on('app.ready', function(){

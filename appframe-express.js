@@ -1,6 +1,8 @@
 'use strict';
 var path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	http = require('http'),
+	https = require('https');
 
 var _ = require('lodash'),
 	express = require('express'),
@@ -80,16 +82,26 @@ module.exports = require('appframe')().registerPlugin({
 			app.emit('app.register', 'express');
 			return callback(err);
 		};
+
+		if(app.config.express.https && app.config.express.certs){
+			app.httpServer = https.createServer(_.defaults(app.config.express.httpsOptions, {
+				key: fs.readFileSync(app.config.express.certs.key),
+				cert: fs.readFileSync(app.config.express.certs.cert)
+			}), app.server);
+		}else{
+			app.httpServer = http.createServer(app.server);
+		}
+
 		if(app.config.express.port && app.config.express.host){
-			app.httpServer = app.server.listen(app.config.express.port, app.config.express.host, ready);
+			app.httpServer.listen(app.config.express.port, app.config.express.host, ready);
 		}else if(app.config.express.port){
-			app.httpServer = app.server.listen(app.config.express.port, ready);
+			app.httpServer.listen(app.config.express.port, ready);
 		}else if(app.config.express.file){
 			if(fs.existsSync(app.config.express.file)){
 			    fs.unlinkSync(app.config.express.file);
 			}
 			var mask = process.umask(0);
-			app.httpServer = app.server.listen(app.config.express.file, function(){
+			app.httpServer.listen(app.config.express.file, function(){
 				process.umask(mask);
 				ready();
 			});

@@ -7,6 +7,16 @@
 	// disabling this will prevent 500 and 404 errors from being handled via JSON automatically
 	"handleError": true,
 
+	// enabling this will expect the server to have a cert
+	"https": false,
+
+	// for HTTPS, provide a cert
+	//"certs": {
+	//	"key": "./store/private_key.pem",
+	//	"cert": "./store/cert.pem",
+	//},
+	
+
 	// static folder mounting
 	"static": {
 		// "./path/to/folder": { ... }

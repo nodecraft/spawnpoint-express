@@ -1,6 +1,6 @@
 {
   "name": "appframe-express",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "Express plugin for appframe.js NPM module",
   "main": "appframe-express.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "express": "4.15.2",
     "joi": "10.2.2",
     "lodash": "*",
-    "helmet": "3.4.1",
+    "helmet": "3.5.0",
     "compression": "1.6.2"
   }
 }

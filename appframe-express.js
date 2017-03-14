@@ -85,8 +85,8 @@ module.exports = require('appframe')().registerPlugin({
 
 		if(app.config.express.https && app.config.express.certs){
 			app.httpServer = https.createServer(_.defaults(app.config.express.httpsOptions, {
-				key: fs.readFileSync(app.config.express.certs.key),
-				cert: fs.readFileSync(app.config.express.certs.cert)
+				key: fs.readFileSync(app.cwd + app.config.express.certs.key),
+				cert: fs.readFileSync(app.cwd + app.config.express.certs.cert)
 			}), app.server);
 		}else{
 			app.httpServer = http.createServer(app.server);

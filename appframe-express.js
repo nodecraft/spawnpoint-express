@@ -153,6 +153,25 @@ module.exports = require('appframe')().registerPlugin({
 		}
 		if(app.config.express.helmet){
 			if(typeof(app.config.express.helmet) === 'object'){
+				if(app.config.express.helmet.contentSecurityPolicy && app.config.express.helmet.contentSecurityPolicy.generateNonces){
+					var range = _.range(app.config.express.helmet.contentSecurityPolicy.generateNonces);
+					app.server.use(function(req, res, next){
+						var nonces = [];
+						_.each(range, function(){
+							nonces.push(app.random(20));
+						});
+						res.locals._nonces = nonces;
+						return next();
+					});
+					_.each(range, function(i){
+						if(app.config.express.helmet.contentSecurityPolicy.directives && app.config.express.helmet.contentSecurityPolicy.directives.scriptSrc){
+							app.config.express.helmet.contentSecurityPolicy.directives.scriptSrc.push(function(req, res){
+								if(!res.locals._nonces || !res.locals._nonces[i]){ return; }
+								return "'nonce-" + res.locals._nonces[i] + "'";
+							});
+						}
+					})
+				}
 				_.each(app.config.express.helmet, function(config, module){
 					if(config === false){
 						return;

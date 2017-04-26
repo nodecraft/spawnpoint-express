@@ -15,7 +15,9 @@
 	//	"key": "./store/private_key.pem",
 	//	"cert": "./store/cert.pem",
 	//},
-	
+
+	// wait for app.ready event before serving requests
+	"waitForReady": true,
 
 	// static folder mounting
 	"static": {

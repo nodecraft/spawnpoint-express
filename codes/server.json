@@ -7,7 +7,7 @@
 	"express.status_202": "Request successfully received and is being processed.",
 	"express.status_204": "Request successfully received and has no response.",
 
-	"express.status_301": "Resource moved permanantly.",
+	"express.status_301": "Resource moved permanently.",
 	"express.status_302": "Resource found and moved temporarily.",
 	"express.status_307": "Resource moved temporarily.",
 
@@ -32,5 +32,7 @@
 	"express.status_503": "Service unavailable.",
 	"express.status_504": "Gateway timeout.",
 	"express.status_507": "Insufficient storage.",
-	"express.status_520": "Unknown error occured."
+	"express.status_520": "Unknown error occurred.",
+
+	"express.not_ready": "The server is still starting up. Please retry your request in a few seconds."
 }

@@ -144,6 +144,16 @@ module.exports = require('appframe')().registerPlugin({
 			attemptClose();
 		});
 
+		// handle ready
+		if(app.config.express.waitForReady){
+			app.emit('express.middleware', function(req, res, next){
+				if(!app.status.running){
+					return next(app.failCode('express.not_ready'));
+				}
+				return next()
+			});
+		}
+
 		// setup body parsers
 		if(app.config.express.bodyParser){
 			_.each(app.config.express.bodyParser, function(opts, key){
@@ -279,7 +289,7 @@ module.exports = require('appframe')().registerPlugin({
 			app.server.use(path, fn);
 		});
 		if(app.config.express.handleError){
-			app.on('app.ready', function(){
+			app.once('app.ready', function(){
 				app.server.use(function(err, req, res, next){
 					if(err){
 						app.error('Express Application Error').debug(err.stack || err);

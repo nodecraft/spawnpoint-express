@@ -1,32 +1,40 @@
 {
-  "name": "appframe-express",
-  "version": "0.4.5",
-  "description": "Express plugin for appframe.js NPM module",
-  "main": "appframe-express.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nodecraft/appframe-express.js.git"
-  },
-  "keywords": [
-    "express",
-    "appframe"
-  ],
-  "author": "NodeCraft Hosting LLC",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/nodecraft/appframe-express.js/issues"
-  },
-  "homepage": "https://github.com/nodecraft/appframe-express.js#readme",
-  "dependencies": {
-    "appframe": "*",
-    "lodash": "*",
-    "body-parser": "1.18.1",
-    "express": "4.15.4",
-    "joi": "10.6.0",
-    "helmet": "3.8.1",
-    "compression": "1.7.0"
-  }
+	"name": "appframe-express",
+	"version": "0.4.6",
+	"description": "Express plugin for appframe.js NPM module",
+	"main": "appframe-express.js",
+	"scripts": {
+		"test": "npm run lint",
+		"lint": "eslint .",
+		"precommit": "lint"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nodecraft/appframe-express.js.git"
+	},
+	"keywords": [
+		"express",
+		"appframe"
+	],
+	"author": "NodeCraft Hosting LLC",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/nodecraft/appframe-express.js/issues"
+	},
+	"homepage": "https://github.com/nodecraft/appframe-express.js#readme",
+	"dependencies": {
+		"appframe": "*",
+		"body-parser": "1.18.2",
+		"compression": "1.7.0",
+		"express": "4.15.5",
+		"helmet": "3.8.1",
+		"joi": "11.1.1",
+		"lodash": "*"
+	},
+	"devDependencies": {
+		"eslint": "4.7.2",
+		"eslint-config-nodecraft": "1.0.8",
+		"eslint-plugin-json": "1.2.0",
+		"eslint-plugin-node": "5.1.1"
+	}
 }

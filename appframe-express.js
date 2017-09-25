@@ -24,7 +24,7 @@ module.exports = require('appframe')().registerPlugin({
 		// prevent cross site JSON
 		app.server.response.secureJSON = function(data){
 			return this.type('json').end(")]}',\n" + JSON.stringify(data));
-		}
+		};
 
 		// setup express to handle error codes for better API responses
 		app.server.response.success = function(code, data){
@@ -34,7 +34,7 @@ module.exports = require('appframe')().registerPlugin({
 				response.data = data;
 			}
 			return this.json(response);
-		}
+		};
 		app.server.response.fail = function(error, data){
 			var response = app.code('express.generic_error'),
 				checkError = app.maskErrorToCode(error);
@@ -64,7 +64,7 @@ module.exports = require('appframe')().registerPlugin({
 				response.error = false;
 			}
 			return this.json(response);
-		}
+		};
 
 		// register express with appframe
 		var ready = function(err){
@@ -98,7 +98,7 @@ module.exports = require('appframe')().registerPlugin({
 			app.httpServer.listen(app.config.express.port, ready);
 		}else if(app.config.express.file){
 			if(fs.existsSync(app.config.express.file)){
-			    fs.unlinkSync(app.config.express.file);
+				fs.unlinkSync(app.config.express.file);
 			}
 			var mask = process.umask(0);
 			app.httpServer.listen(app.config.express.file, function(){
@@ -127,7 +127,7 @@ module.exports = require('appframe')().registerPlugin({
 			});
 			var lastCount = null;
 			var attemptClose = function(){
-				var openReqs =  Object.keys(requests).length;
+				var openReqs = Object.keys(requests).length;
 				if(lastCount !== null && lastCount === openReqs){
 					return;
 				}
@@ -150,7 +150,7 @@ module.exports = require('appframe')().registerPlugin({
 				if(!app.status.running){
 					return next(app.failCode('express.not_ready'));
 				}
-				return next()
+				return next();
 			});
 		}
 
@@ -180,7 +180,7 @@ module.exports = require('appframe')().registerPlugin({
 								return "'nonce-" + res.locals._nonces[i] + "'";
 							});
 						}
-					})
+					});
 				}
 				_.each(app.config.express.helmet, function(config, module){
 					if(config === false){
@@ -216,7 +216,7 @@ module.exports = require('appframe')().registerPlugin({
 					if(err){
 						var errors = {};
 						err.details.forEach(function(item){
-							var name = fieldRegex.exec(item.path);
+							var name = fieldRegex.exec(item.path.join('.'));
 							if(name && name[1] && name[2]){
 								errors[name[2]] = {
 									message: item.message,
@@ -234,21 +234,21 @@ module.exports = require('appframe')().registerPlugin({
 					});
 					return next();
 				});
-			}
-		}
+			};
+		};
 		app.server.use(function(req, res, next){
 			res.invalid = function(fields){
 				var errors = {};
 				_.each(fields, function(message, field){
 					errors[field] = {
 						type: 'custom_message',
-						message: typeof(message) == 'object' && message.message || message
+						message: typeof(message) === 'object' && message.message || message
 					};
 				});
 				return res.status(400).fail('express.validation', {
 					fields: errors
 				});
-			}
+			};
 			return next();
 		});
 
@@ -258,7 +258,7 @@ module.exports = require('appframe')().registerPlugin({
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
 			if(app.config.debug){
-				app.info('> ' + req.method + ': ' +  req.originalUrl);
+				app.info('> ' + req.method + ': ' + req.originalUrl);
 			}
 			var cleanup = function(){
 				delete requests[req.id];
@@ -294,7 +294,7 @@ module.exports = require('appframe')().registerPlugin({
 					if(err){
 						app.error('Express Application Error').debug(err.stack || err);
 						if(res.headersSent){
-							return app.warn('Headers already sent, no error status sent');;
+							return app.warn('Headers already sent, no error status sent');
 						}
 						return res.fail(err);
 					}

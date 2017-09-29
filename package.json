@@ -1,6 +1,6 @@
 {
 	"name": "appframe-express",
-	"version": "0.4.7",
+	"version": "0.4.8",
 	"description": "Express plugin for appframe.js NPM module",
 	"main": "appframe-express.js",
 	"scripts": {
@@ -24,15 +24,15 @@
 	"homepage": "https://github.com/nodecraft/appframe-express.js#readme",
 	"dependencies": {
 		"appframe": "*",
-		"body-parser": "1.18.2",
+		"body-parser": "1.18.x",
 		"compression": "1.7.1",
-		"express": "4.16.0",
-		"helmet": "3.8.2",
-		"joi": "11.1.1",
+		"express": "4.x",
+		"helmet": "3.8.x",
+		"joi": "11.x",
 		"lodash": "*"
 	},
 	"devDependencies": {
-		"eslint": "4.7.2",
+		"eslint": "4.8.0",
 		"eslint-config-nodecraft": "1.0.8",
 		"eslint-plugin-json": "1.2.0",
 		"eslint-plugin-node": "5.2.0"

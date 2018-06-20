@@ -16,7 +16,7 @@
 		"express",
 		"appframe"
 	],
-	"author": "Nodecraft Hosting LLC",
+	"author": "Nodecraft Inc.",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/nodecraft/appframe-express.js/issues"
@@ -28,11 +28,11 @@
 		"compression": "^1.7.2",
 		"express": "4.x",
 		"helmet": "3.x",
-		"joi": "12.x",
+		"joi": "13.x",
 		"lodash": "*"
 	},
 	"devDependencies": {
-		"eslint": "^4.18.2",
+		"eslint": "^4.19.1",
 		"eslint-config-nodecraft": "^1.0.11",
 		"eslint-plugin-json": "^1.2.0",
 		"eslint-plugin-node": "^6.0.1"

@@ -7,6 +7,12 @@
 	// disabling this will prevent 500 and 404 errors from being handled via JSON automatically
 	"handleError": true,
 
+	// Namespaces for express and raw http(s) hoisted to app
+	"namespace": {
+		"server": "server",
+		"httpServer": "httpServer"
+	},
+
 	// enabling this will expect the server to have a cert
 	"https": false,
 

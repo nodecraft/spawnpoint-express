@@ -16,18 +16,23 @@ module.exports = require('appframe')().registerPlugin({
 	namespace: "express",
 	callback: true,
 	exports: function(app, callback){
-		app.joi = require('joi');
-		app.server = express();
+		const config = app.config[this.namespace];
+		const appNS = config.namespace.server,
+			serverNS = config.namespace.httpServer;
+		if(!app.joi){
+			app.joi = require('joi');
+		}
+		app[appNS] = express();
 
-		app.server.set('x-powered-by', false);
+		app[appNS].set('x-powered-by', false);
 
 		// prevent cross site JSON
-		app.server.response.secureJSON = function(data){
+		app[appNS].response.secureJSON = function(data){
 			return this.type('json').end(")]}',\n" + JSON.stringify(data));
 		};
 
 		// setup express to handle error codes for better API responses
-		app.server.response.success = function(code, data){
+		app[appNS].response.success = function(code, data){
 			var response = app.code(code);
 			response.success = true;
 			if(data){
@@ -35,7 +40,7 @@ module.exports = require('appframe')().registerPlugin({
 			}
 			return this.json(response);
 		};
-		app.server.response.fail = function(error, data){
+		app[appNS].response.fail = function(error, data){
 			var response = app.code('express.generic_error'),
 				checkError = app.maskErrorToCode(error);
 			if(checkError !== false){
@@ -69,12 +74,12 @@ module.exports = require('appframe')().registerPlugin({
 		// register express with appframe
 		var ready = function(err){
 			if(!err){
-				var address = app.httpServer.address();
+				var address = app[serverNS].address();
 
-				if(app.config.express.port){
+				if(config.port){
 					app.info('Server online at %s:%s', address.address, address.port);
-				}else if(app.config.express.file){
-					app.info('Server online via %s', app.config.express.file);
+				}else if(config.file){
+					app.info('Server online via %s', config.file);
 				}else{
 					app.info('Server online!');
 				}
@@ -83,25 +88,25 @@ module.exports = require('appframe')().registerPlugin({
 			return callback(err);
 		};
 
-		if(app.config.express.https && app.config.express.certs){
-			app.httpServer = https.createServer(_.defaults(app.config.express.httpsOptions, {
-				key: fs.readFileSync(app.cwd + app.config.express.certs.key),
-				cert: fs.readFileSync(app.cwd + app.config.express.certs.cert)
-			}), app.server);
+		if(config.https && config.certs){
+			app[serverNS] = https.createServer(_.defaults(config.httpsOptions, {
+				key: fs.readFileSync(app.cwd + config.certs.key),
+				cert: fs.readFileSync(app.cwd + config.certs.cert)
+			}), app[appNS]);
 		}else{
-			app.httpServer = http.createServer(app.server);
+			app[serverNS] = http.createServer(app[appNS]);
 		}
 
-		if(app.config.express.port && app.config.express.host){
-			app.httpServer.listen(app.config.express.port, app.config.express.host, ready);
-		}else if(app.config.express.port){
-			app.httpServer.listen(app.config.express.port, ready);
-		}else if(app.config.express.file){
-			if(fs.existsSync(app.config.express.file)){
-				fs.unlinkSync(app.config.express.file);
+		if(config.port && config.host){
+			app[serverNS].listen(config.port, config.host, ready);
+		}else if(config.port){
+			app[serverNS].listen(config.port, ready);
+		}else if(config.file){
+			if(fs.existsSync(config.file)){
+				fs.unlinkSync(config.file);
 			}
 			var mask = process.umask(0);
-			app.httpServer.listen(app.config.express.file, function(){
+			app[serverNS].listen(config.file, function(){
 				process.umask(mask);
 				ready();
 			});
@@ -111,10 +116,10 @@ module.exports = require('appframe')().registerPlugin({
 		// track clients to gracefully close server
 		var clients = {},
 			requests = {};
-		app.httpServer.on('error', function(err){
+		app[serverNS].on('error', function(err){
 			app.error('HTTP server error').debug(err);
 		});
-		app.httpServer.on('connection', function(client){
+		app[serverNS].on('connection', function(client){
 			client.id = app.random(64);
 			clients[client.id] = client;
 			client.once('close', function(){
@@ -122,7 +127,7 @@ module.exports = require('appframe')().registerPlugin({
 			});
 		});
 		app.once('app.close', function(){
-			app.httpServer.close(function(){
+			app[serverNS].close(function(){
 				app.emit('app.deregister', 'express');
 			});
 			var lastCount = null;
@@ -145,7 +150,7 @@ module.exports = require('appframe')().registerPlugin({
 		});
 
 		// handle ready
-		if(app.config.express.waitForReady){
+		if(config.waitForReady){
 			app.emit('express.middleware', function(req, res, next){
 				if(!app.status.running){
 					return next(app.failCode('express.not_ready'));
@@ -155,17 +160,17 @@ module.exports = require('appframe')().registerPlugin({
 		}
 
 		// setup body parsers
-		if(app.config.express.bodyParser){
-			_.each(app.config.express.bodyParser, function(opts, key){
+		if(config.bodyParser){
+			_.each(config.bodyParser, function(opts, key){
 				app.info('Enabling body parser: %s.', key);
-				app.server.use(bodyParser[key](opts));
+				app[appNS].use(bodyParser[key](opts));
 			});
 		}
-		if(app.config.express.helmet){
-			if(typeof(app.config.express.helmet) === 'object'){
-				if(app.config.express.helmet.contentSecurityPolicy && app.config.express.helmet.contentSecurityPolicy.generateNonces){
-					var range = _.range(app.config.express.helmet.contentSecurityPolicy.generateNonces);
-					app.server.use(function(req, res, next){
+		if(config.helmet){
+			if(typeof(config.helmet) === 'object'){
+				if(config.helmet.contentSecurityPolicy && config.helmet.contentSecurityPolicy.generateNonces){
+					var range = _.range(config.helmet.contentSecurityPolicy.generateNonces);
+					app[appNS].use(function(req, res, next){
 						var nonces = [];
 						_.each(range, function(){
 							nonces.push(app.random(20));
@@ -174,40 +179,40 @@ module.exports = require('appframe')().registerPlugin({
 						return next();
 					});
 					_.each(range, function(i){
-						if(app.config.express.helmet.contentSecurityPolicy.directives && app.config.express.helmet.contentSecurityPolicy.directives.scriptSrc){
-							app.config.express.helmet.contentSecurityPolicy.directives.scriptSrc.push(function(req, res){
+						if(config.helmet.contentSecurityPolicy.directives && config.helmet.contentSecurityPolicy.directives.scriptSrc){
+							config.helmet.contentSecurityPolicy.directives.scriptSrc.push(function(req, res){
 								if(!res.locals._nonces || !res.locals._nonces[i]){ return; }
 								return "'nonce-" + res.locals._nonces[i] + "'";
 							});
 						}
 					});
 				}
-				_.each(app.config.express.helmet, function(config, module){
-					if(config === false){
+				_.each(config.helmet, function(helmitConfig, module){
+					if(helmitConfig === false){
 						return;
 					}
 					if(!helmet[module]){ return app.error('Invalid helmet module [%s]', module); }
-					if(config === true){
-						return app.server.use(helmet[module]());
+					if(helmitConfig === true){
+						return app[appNS].use(helmet[module]());
 					}
-					return app.server.use(helmet[module](config));
+					return app[appNS].use(helmet[module](helmitConfig));
 				});
 			}else{
-				app.server.use(helmet());
+				app[appNS].use(helmet());
 			}
 		}
 
 		// setup validation errors
-		var fieldRegex = new RegExp("(" + app.config.express.validation.dataTypes.join('|') + ")\\.(.*)");
-		app.server.validate = function(schema, options){
+		var fieldRegex = new RegExp("(" + config.validation.dataTypes.join('|') + ")\\.(.*)");
+		app[appNS].validate = function(schema, options){
 			options = options || {};
-			options = _.defaults(options, app.config.express.validation.options);
+			options = _.defaults(options, config.validation.options);
 			return function(req, res, next){
 				var data = {};
 				_.each(schema, function(v, key){
 					data[key] = {};
 				});
-				app.config.express.validation.dataTypes.forEach(function(type){
+				config.validation.dataTypes.forEach(function(type){
 					if(_.keys(req[type]).length > 0){
 						data[type] = req[type];
 					}
@@ -236,7 +241,7 @@ module.exports = require('appframe')().registerPlugin({
 				});
 			};
 		};
-		app.server.use(function(req, res, next){
+		app[appNS].use(function(req, res, next){
 			res.invalid = function(fields){
 				var errors = {};
 				_.each(fields, function(message, field){
@@ -253,7 +258,7 @@ module.exports = require('appframe')().registerPlugin({
 		});
 
 		// track requests open/close
-		app.server.use(function(req, res, next){
+		app[appNS].use(function(req, res, next){
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
@@ -269,28 +274,28 @@ module.exports = require('appframe')().registerPlugin({
 			return next();
 		});
 
-		if(app.config.express.compression){
-			if(typeof(app.config.express.compression) === 'object'){
-				app.server.use(compression(app.config.express.compression));
+		if(config.compression){
+			if(typeof(config.compression) === 'object'){
+				app[appNS].use(compression(config.compression));
 			}else{
-				app.server.use(compression());
+				app[appNS].use(compression());
 			}
 		}
-		if(app.config.express.static){
-			_.each(app.config.express.static, function(opts, folder){
-				app.server.use(express.static(path.join(app.cwd + folder), opts));
+		if(config.static){
+			_.each(config.static, function(opts, folder){
+				app[appNS].use(express.static(path.join(app.cwd + folder), opts));
 			});
 		}
 
 		app.on('express.middleware', function(path, fn){
 			if(path && !fn){
-				return app.server.use(path);
+				return app[appNS].use(path);
 			}
-			app.server.use(path, fn);
+			app[appNS].use(path, fn);
 		});
-		if(app.config.express.handleError){
+		if(config.handleError){
 			app.once('app.ready', function(){
-				app.server.use(function(err, req, res, next){
+				app[appNS].use(function(err, req, res, next){
 					if(err){
 						app.error('Express Application Error').debug(err.stack || err);
 						if(res.headersSent){
@@ -300,7 +305,7 @@ module.exports = require('appframe')().registerPlugin({
 					}
 					return next();
 				});
-				app.server.use(function(req, res){
+				app[appNS].use(function(req, res){
 					app.debug('404 request: %s', req.originalUrl);
 					return res.status(404).fail('express.status_404');
 				});

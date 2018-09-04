@@ -259,6 +259,7 @@ module.exports = require('appframe')().registerPlugin({
 
 		// track requests open/close
 		app[appNS].use(function(req, res, next){
+			req.appframe_namespace = appNS;
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
@@ -287,12 +288,15 @@ module.exports = require('appframe')().registerPlugin({
 			});
 		}
 
-		app.on('express.middleware', function(path, fn){
+		const middleware = function(path, fn){
 			if(path && !fn){
 				return app[appNS].use(path);
 			}
 			app[appNS].use(path, fn);
-		});
+		};
+
+		app.on('express.middleware', middleware);
+		app.on('express.middleware.' + appNS, middleware);
 		if(config.handleError){
 			app.once('app.ready', function(){
 				app[appNS].use(function(err, req, res, next){

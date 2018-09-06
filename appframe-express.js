@@ -93,6 +93,20 @@ module.exports = require('appframe')().registerPlugin({
 				key: fs.readFileSync(app.cwd + config.certs.key),
 				cert: fs.readFileSync(app.cwd + config.certs.cert)
 			}), app[appNS]);
+
+			// Code referenced from https://github.com/nodejs/node/issues/4464#issuecomment-357975317
+			app[serverNS].setCerts = function(certs){
+				if(certs && certs.cert && _.has(app[serverNS], '_sharedCreds.context.setCert')){
+					app[serverNS]._sharedCreds.context.setCert(certs.cert);
+				}else{
+					app.warn('Failed to live set SSL certificate');
+				}
+				if(certs && certs.key && _.has(app[serverNS], '_sharedCreds.context.setKey')){
+					app[serverNS]._sharedCreds.context.setKey(certs.key);
+				}else{
+					app.warn('Failed to live set SSL Key');
+				}
+			};
 		}else{
 			app[serverNS] = http.createServer(app[appNS]);
 		}

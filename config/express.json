@@ -48,5 +48,11 @@
 		// urlencoded: {
 		//	extended: false
 		// }
+	},
+
+	// specify what libraries to hoist. Default to always loading joi, but not helmet
+	"hoist": {
+		"joi": true,
+		"helmet": false
 	}
 }

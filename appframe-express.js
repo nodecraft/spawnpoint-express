@@ -19,9 +19,12 @@ module.exports = require('appframe')().registerPlugin({
 		const config = app.config[this.namespace];
 		const appNS = config.namespace.server,
 			serverNS = config.namespace.httpServer;
-		if(!app.joi){
-			app.joi = require('joi');
-		}
+
+		_.each(config.hoist, function(value, library){
+			if(value && !app[library]){
+				app[library] = require(library);
+			}
+		});
 		app[appNS] = express();
 
 		app[appNS].set('x-powered-by', false);

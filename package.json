@@ -1,8 +1,8 @@
 {
-	"name": "appframe-express",
-	"version": "0.6.0",
-	"description": "Express plugin for appframe.js NPM module",
-	"main": "appframe-express.js",
+	"name": "spawnpoint-express",
+	"version": "1.0.0",
+	"description": "Express plugin for Spawnpoint framework",
+	"main": "spawnpoint-express.js",
 	"scripts": {
 		"test": "npm run lint",
 		"lint": "eslint .",
@@ -10,7 +10,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/nodecraft/appframe-express.js.git"
+		"url": "git+https://github.com/nodecraft/spawnpoint-express.git"
 	},
 	"keywords": [
 		"express",
@@ -19,22 +19,22 @@
 	"author": "Nodecraft Inc.",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/nodecraft/appframe-express.js/issues"
+		"url": "https://github.com/nodecraft/spawnpoint-express/issues"
 	},
-	"homepage": "https://github.com/nodecraft/appframe-express.js#readme",
+	"homepage": "https://github.com/nodecraft/spawnpoint-express#readme",
 	"dependencies": {
-		"appframe": "*",
+		"spawnpoint": "*",
 		"body-parser": "1.18.x",
-		"compression": "^1.7.3",
+		"compression": "1.7.3",
 		"express": "4.x",
 		"helmet": "3.x",
 		"joi": "13.x",
 		"lodash": "*"
 	},
 	"devDependencies": {
-		"eslint": "^5.7.0",
-		"eslint-config-nodecraft": "^1.0.14",
-		"eslint-plugin-json": "^1.2.1",
-		"eslint-plugin-node": "^7.0.1"
+		"eslint": "^5.10.0",
+		"eslint-config-nodecraft": "^1.1.5",
+		"eslint-plugin-json": "^1.3.2",
+		"eslint-plugin-node": "^8.0.0"
 	}
 }

@@ -10,7 +10,7 @@ var _ = require('lodash'),
 	helmet = require('helmet'),
 	compression = require('compression');
 
-module.exports = require('appframe')().registerPlugin({
+module.exports = require('spawnpoint').registerPlugin({
 	dir: __dirname,
 	name: "Express",
 	namespace: "express",
@@ -74,7 +74,7 @@ module.exports = require('appframe')().registerPlugin({
 			return this.json(response);
 		};
 
-		// register express with appframe
+		// register express with spawnpoint
 		var ready = function(err){
 			if(!err){
 				var address = app[serverNS].address();
@@ -276,7 +276,7 @@ module.exports = require('appframe')().registerPlugin({
 
 		// track requests open/close
 		app[appNS].use(function(req, res, next){
-			req.appframe_namespace = appNS;
+			req.spawnpoint_namespace = appNS;
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
 			app.emit('express.request_open', req);

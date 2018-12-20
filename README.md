@@ -1,5 +1,5 @@
-# appframe-express
-[Express](http://expressjs.com/) Plugin for [Appframe](https://github.com/nodecraft/appframe.js) on NPM. This currently does not support SSL.
+# Spawnpoint-express
+[Express](http://expressjs.com/) Plugin for [Spawnpoint](https://github.com/nodecraft/spawnpoint).
 
 ## API
 This api is mounted at `app.server` as a new express app. Also mounts `app.joi` for validation. Has following methods:
@@ -67,7 +67,7 @@ res.invalid({
 ```
 ##### `response.fail(error [, data])`
 Outputs JSON object with code, message, and optional data.
- - `error` *mixed* - This corresponds an error code string, error code object, errorCode appframe Error, failCode appframe Error, or registered error from within appframe.
+ - `error` *mixed* - This corresponds an error code string, error code object, errorCode Spawnpoint Error, failCode Spawnpoint Error, or registered error from within Spawnpoint.
  - `data` *any* - This is attached to the JSON reply as `response.data`
 
 ```javascript
@@ -87,7 +87,7 @@ res.fail(error);
 
 ##### `response.success(code [, data])`
 Outputs JSON object with code, message, and optional data.
- - `code` *string* - This corresponds with an appframe code to populate response
+ - `code` *string* - This corresponds with an Spawnpoint code to populate response
  - `data` *any* - This is attached to the JSON reply as `response.data`
 
 ```javascript
@@ -105,7 +105,7 @@ res.success('user.found', {user: user});
 ```
 ##### `response.fail(error [, data])`
 Outputs JSON object with code, message, and optional data.
- - `error` *mixed* - This corresponds an error code string, error code object, errorCode appframe Error, failCode appframe Error, or registered error from within appframe.
+ - `error` *mixed* - This corresponds an error code string, error code object, errorCode Spawnpoint Error, failCode Spawnpoint Error, or registered error from within Spawnpoint.
  - `data` *any* - This is attached to the JSON reply as `response.data`
 
 ```javascript

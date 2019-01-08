@@ -1,0 +1,9 @@
+/test/
+/store/
+/examples/
+/logo/
+/.nyc_output/
+/.editorconfig
+/.eslintignore
+/.eslintrc.json
+/.travis.yml

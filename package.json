@@ -1,6 +1,6 @@
 {
 	"name": "spawnpoint-express",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Express plugin for Spawnpoint framework",
 	"main": "spawnpoint-express.js",
 	"scripts": {
@@ -28,13 +28,13 @@
 		"compression": "1.7.3",
 		"express": "4.x",
 		"helmet": "3.x",
-		"joi": "13.x",
+		"joi": "14.x",
 		"lodash": "*"
 	},
 	"devDependencies": {
-		"eslint": "^5.10.0",
+		"eslint": "^5.12.0",
 		"eslint-config-nodecraft": "^1.1.5",
 		"eslint-plugin-json": "^1.3.2",
-		"eslint-plugin-node": "^8.0.0"
+		"eslint-plugin-node": "^8.0.1"
 	}
 }

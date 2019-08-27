@@ -4,7 +4,7 @@
 [![npm version](https://badge.fury.io/js/spawnpoint-express.svg)](https://badge.fury.io/js/spawnpoint-express)
 [![dependencies Status](https://david-dm.org/nodecraft/spawnpoint-express/status.svg)](https://david-dm.org/nodecraft/spawnpoint-express)
 [![Build Status](https://travis-ci.org/nodecraft/spawnpoint-express.svg?branch=master)](https://travis-ci.org/nodecraft/spawnpoint-express)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnodecraft%2Fspawnpoint-express.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnodecraft%2Fspawnpoint-express?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnodecraft%2Fspawnpoint-express.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnodecraft%2Fspawnpoint-express?ref=badge_shield) [![Greenkeeper badge](https://badges.greenkeeper.io/nodecraft/spawnpoint-express.svg)](https://greenkeeper.io/)
 
 ## API
 This api is mounted at `app.server` as a new express app. Also mounts `app.joi` for validation. Has following methods:

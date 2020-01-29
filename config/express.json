@@ -50,6 +50,9 @@
 		// }
 	},
 
+	// log every request path and method to the console. Default true
+	"logRequests": true,
+
 	// specify what libraries to hoist. Default to always loading joi, but not helmet
 	"hoist": {
 		"joi": true,

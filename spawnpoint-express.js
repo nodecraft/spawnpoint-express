@@ -280,7 +280,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
-			if(app.config.debug){
+			if(app.config.debug && config.logRequests){
 				app.info('> ' + req.method + ': ' + req.originalUrl);
 			}
 			var cleanup = function(){

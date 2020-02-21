@@ -1,10 +1,10 @@
 'use strict';
-var path = require('path'),
+const path = require('path'),
 	fs = require('fs'),
 	http = require('http'),
 	https = require('https');
 
-var _ = require('lodash'),
+const _ = require('lodash'),
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	helmet = require('helmet'),
@@ -36,7 +36,7 @@ module.exports = require('spawnpoint').registerPlugin({
 
 		// setup express to handle error codes for better API responses
 		app[appNS].response.success = function(code, data){
-			var response = app.code(code);
+			const response = app.code(code);
 			response.success = true;
 			if(data){
 				response.data = data;
@@ -44,8 +44,8 @@ module.exports = require('spawnpoint').registerPlugin({
 			return this.json(response);
 		};
 		app[appNS].response.fail = function(error, data){
-			var response = app.code('express.generic_error'),
-				checkError = app.maskErrorToCode(error);
+			let response = app.code('express.generic_error');
+			const checkError = app.maskErrorToCode(error);
 			if(checkError !== false){
 				response = checkError;
 			}else if(typeof(error) === 'string'){
@@ -75,9 +75,9 @@ module.exports = require('spawnpoint').registerPlugin({
 		};
 
 		// register express with spawnpoint
-		var ready = function(err){
+		const ready = function(err){
 			if(!err){
-				var address = app[serverNS].address();
+				const address = app[serverNS].address();
 
 				if(config.port){
 					app.info('Server online at %s:%s', address.address, address.port);
@@ -122,7 +122,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			if(fs.existsSync(config.file)){
 				fs.unlinkSync(config.file);
 			}
-			var mask = process.umask(0);
+			const mask = process.umask(0);
 			app[serverNS].listen(config.file, function(){
 				process.umask(mask);
 				ready();
@@ -131,7 +131,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			throw new Error('No port, host, or file set to listen');
 		}
 		// track clients to gracefully close server
-		var clients = {},
+		const clients = {},
 			requests = {};
 		app[serverNS].on('error', function(err){
 			app.error('HTTP server error').debug(err);
@@ -147,9 +147,9 @@ module.exports = require('spawnpoint').registerPlugin({
 			app[serverNS].close(function(){
 				app.emit('app.deregister', 'express');
 			});
-			var lastCount = null;
-			var attemptClose = function(){
-				var openReqs = Object.keys(requests).length;
+			let lastCount = null;
+			const attemptClose = function(){
+				const openReqs = Object.keys(requests).length;
 				if(lastCount !== null && lastCount === openReqs){
 					return;
 				}
@@ -186,9 +186,9 @@ module.exports = require('spawnpoint').registerPlugin({
 		if(config.helmet){
 			if(typeof(config.helmet) === 'object'){
 				if(config.helmet.contentSecurityPolicy && config.helmet.contentSecurityPolicy.generateNonces){
-					var range = _.range(config.helmet.contentSecurityPolicy.generateNonces);
+					const range = _.range(config.helmet.contentSecurityPolicy.generateNonces);
 					app[appNS].use(function(req, res, next){
-						var nonces = [];
+						const nonces = [];
 						_.each(range, function(){
 							nonces.push(app.random(20));
 						});
@@ -220,12 +220,12 @@ module.exports = require('spawnpoint').registerPlugin({
 		}
 
 		// setup validation errors
-		var fieldRegex = new RegExp("(" + config.validation.dataTypes.join('|') + ")\\.(.*)");
+		const fieldRegex = new RegExp("(" + config.validation.dataTypes.join('|') + ")\\.(.*)");
 		app[appNS].validate = function(schema, options){
 			options = options || {};
 			options = _.defaults(options, config.validation.options);
 			return function(req, res, next){
-				var data = {};
+				const data = {};
 				_.each(schema, function(v, key){
 					data[key] = {};
 				});
@@ -236,9 +236,9 @@ module.exports = require('spawnpoint').registerPlugin({
 				});
 				app.joi.validate(data, schema, options, function(err, results){
 					if(err){
-						var errors = {};
+						const errors = {};
 						err.details.forEach(function(item){
-							var name = fieldRegex.exec(item.path.join('.'));
+							const name = fieldRegex.exec(item.path.join('.'));
 							if(name && name[1] && name[2]){
 								errors[name[2]] = {
 									message: item.message,
@@ -260,7 +260,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		};
 		app[appNS].use(function(req, res, next){
 			res.invalid = function(fields){
-				var errors = {};
+				const errors = {};
 				_.each(fields, function(message, field){
 					errors[field] = {
 						type: 'custom_message',
@@ -283,7 +283,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			if(app.config.debug && config.logRequests){
 				app.info('> ' + req.method + ': ' + req.originalUrl);
 			}
-			var cleanup = function(){
+			const cleanup = function(){
 				delete requests[req.id];
 				app.emit('express.request_finish', req);
 			};

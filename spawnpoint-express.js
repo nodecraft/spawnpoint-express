@@ -29,10 +29,9 @@ module.exports = require('spawnpoint').registerPlugin({
 
 		app[appNS].set('x-powered-by', false);
 
-		// prevent cross site JSON
-		app[appNS].response.secureJSON = function(data){
-			return this.type('json').end(")]}',\n" + JSON.stringify(data));
-		};
+		// This function was used in times gone by, to prevent JSON hijacking, but this isn't a problem nowadays in any modern browser
+		// @deprecated
+		app[appNS].response.secureJSON = app[appNS].response.json;
 
 		// setup express to handle error codes for better API responses
 		app[appNS].response.success = function(code, data){

@@ -167,7 +167,7 @@ module.exports = require('spawnpoint').registerPlugin({
 
 		// handle ready
 		if(config.waitForReady){
-			app.emit('express.middleware', function(req, res, next){
+			app.emit('express.middleware', function waitForReady(req, res, next){
 				if(!app.status.running){
 					return next(app.failCode('express.not_ready'));
 				}
@@ -186,7 +186,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			if(typeof(config.helmet) === 'object'){
 				if(config.helmet.contentSecurityPolicy && config.helmet.contentSecurityPolicy.generateNonces){
 					const range = _.range(config.helmet.contentSecurityPolicy.generateNonces);
-					app[appNS].use(function(req, res, next){
+					app[appNS].use(function generateNonces(req, res, next){
 						const nonces = [];
 						_.each(range, function(){
 							nonces.push(app.random(20));
@@ -223,7 +223,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		app[appNS].validate = function(schema, options){
 			options = options || {};
 			options = _.defaults(options, config.validation.options);
-			return function(req, res, next){
+			return function serverValidate(req, res, next){
 				const data = {};
 				_.each(schema, function(v, key){
 					data[key] = {};
@@ -257,7 +257,7 @@ module.exports = require('spawnpoint').registerPlugin({
 				});
 			};
 		};
-		app[appNS].use(function(req, res, next){
+		app[appNS].use(function setupInvalid(req, res, next){
 			res.invalid = function(fields){
 				const errors = {};
 				_.each(fields, function(message, field){
@@ -274,7 +274,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		});
 
 		// track requests open/close
-		app[appNS].use(function(req, res, next){
+		app[appNS].use(function trackRequests(req, res, next){
 			req.spawnpoint_namespace = appNS;
 			req.id = app.random(128) + '-' + req.originalUrl;
 			requests[req.id] = true;
@@ -315,7 +315,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		app.on('express.middleware.' + appNS, middleware);
 		if(config.handleError){
 			app.once('app.ready', function(){
-				app[appNS].use(function(err, req, res, next){
+				app[appNS].use(function errorHandler(err, req, res, next){
 					if(err){
 						app.error('Express Application Error').debug(err.stack || err);
 						if(res.headersSent){
@@ -325,7 +325,7 @@ module.exports = require('spawnpoint').registerPlugin({
 					}
 					return next();
 				});
-				app[appNS].use(function(req, res){
+				app[appNS].use(function notFoundHandler(req, res){
 					app.debug('404 request: %s', req.originalUrl);
 					return res.status(404).fail('express.status_404');
 				});

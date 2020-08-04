@@ -1,6 +1,6 @@
 {
 	"name": "spawnpoint-express",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Express plugin for Spawnpoint framework",
 	"main": "spawnpoint-express.js",
 	"scripts": {

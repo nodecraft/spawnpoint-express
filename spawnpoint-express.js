@@ -198,6 +198,7 @@ module.exports = require('spawnpoint').registerPlugin({
 							});
 						}
 					});
+					delete config.helmet.contentSecurityPolicy.generateNonces;
 				}
 				_.each(config.helmet, function(helmitConfig, module){
 					if(helmitConfig === false){

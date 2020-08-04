@@ -27,11 +27,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		});
 		app[appNS] = express();
 
-		app[appNS].set('x-powered-by', false);
-
-		// This function was used in times gone by, to prevent JSON hijacking, but this isn't a problem nowadays in any modern browser
-		// @deprecated
-		app[appNS].response.secureJSON = app[appNS].response.json;
+		app[appNS].disable('x-powered-by');
 
 		// setup express to handle error codes for better API responses
 		app[appNS].response.success = function(code, data){
@@ -136,7 +132,7 @@ module.exports = require('spawnpoint').registerPlugin({
 			app.error('HTTP server error').debug(err);
 		});
 		app[serverNS].on('connection', function(client){
-			client.id = app.random(64);
+			client.id = app.random();
 			clients[client.id] = client;
 			client.once('close', function(){
 				delete clients[client.id];
@@ -220,12 +216,15 @@ module.exports = require('spawnpoint').registerPlugin({
 
 		// setup validation errors
 		const fieldRegex = new RegExp("(" + config.validation.dataTypes.join('|') + ")\\.(.*)");
-		app[appNS].validate = function(schema, options){
+		app[appNS].validate = function(rawSchema, options){
 			options = options || {};
 			options = _.defaults(options, config.validation.options);
+
+			// compile schema once for improved performance, so it doesn't have to be recompiled every time
+			const schema = app.joi.compile(rawSchema);
 			return function serverValidate(req, res, next){
 				const data = {};
-				_.each(schema, function(v, key){
+				_.each(rawSchema, function(v, key){
 					data[key] = {};
 				});
 				config.validation.dataTypes.forEach(function(type){
@@ -233,28 +232,33 @@ module.exports = require('spawnpoint').registerPlugin({
 						data[type] = req[type];
 					}
 				});
-				app.joi.validate(data, schema, options, function(err, results){
-					if(err){
-						const errors = {};
-						err.details.forEach(function(item){
-							const name = fieldRegex.exec(item.path.join('.'));
-							if(name && name[1] && name[2]){
-								errors[name[2]] = {
-									message: item.message,
-									type: item.type
-								};
-							}
-						});
-						// catch validation
-						return res.status(400).fail('express.validation', {
-							fields: errors
-						});
+				let results = null;
+				const errors = {};
+				try{
+					results = app.joi.assert(data, schema, null, options);
+				}catch(err){
+					if(err.name !== 'ValidationError' || !err.details){
+						app.debug('Caught unknown JOI error when validating against schema', err);
+						return res.status(400).fail('express.validation');
 					}
-					_.each(results, function(value, key){
-						req[key] = value;
+					err.details.forEach(function(item){
+						const name = fieldRegex.exec(item.path.join('.'));
+						if(name && name[1] && name[2]){
+							errors[name[2]] = {
+								message: item.message,
+								type: item.type
+							};
+						}
 					});
-					return next();
+					return res.status(400).fail('express.validation', {
+						fields: errors
+					});
+				}
+				// passed validation
+				_.each(results, function(value, key){
+					req[key] = value;
 				});
+				return next();
 			};
 		};
 		app[appNS].use(function setupInvalid(req, res, next){
@@ -262,8 +266,8 @@ module.exports = require('spawnpoint').registerPlugin({
 				const errors = {};
 				_.each(fields, function(message, field){
 					errors[field] = {
-						type: 'custom_message',
-						message: typeof(message) === 'object' && message.message || message
+						message: typeof(message) === 'object' && message.message || message,
+						type: 'custom_message'
 					};
 				});
 				return res.status(400).fail('express.validation', {
@@ -276,7 +280,7 @@ module.exports = require('spawnpoint').registerPlugin({
 		// track requests open/close
 		app[appNS].use(function trackRequests(req, res, next){
 			req.spawnpoint_namespace = appNS;
-			req.id = app.random(128) + '-' + req.originalUrl;
+			req.id = app.random() + '-' + req.originalUrl;
 			requests[req.id] = true;
 			app.emit('express.request_open', req);
 			if(app.config.debug && config.logRequests){

@@ -1,14 +1,14 @@
 'use strict';
-const path = require('path'),
-	fs = require('fs'),
-	http = require('http'),
-	https = require('https');
+const path = require('path');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 
-const _ = require('lodash'),
-	express = require('express'),
-	bodyParser = require('body-parser'),
-	helmet = require('helmet'),
-	compression = require('compression');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const compression = require('compression');
 
 module.exports = require('spawnpoint').registerPlugin({
 	dir: __dirname,
@@ -17,8 +17,8 @@ module.exports = require('spawnpoint').registerPlugin({
 	callback: true,
 	exports: function(app, callback){
 		const config = app.config[this.namespace];
-		const appNS = config.namespace.server,
-			serverNS = config.namespace.httpServer;
+		const appNS = config.namespace.server;
+		const serverNS = config.namespace.httpServer;
 
 		_.each(config.hoist, function(value, library){
 			if(value && !app[library]){
@@ -126,8 +126,8 @@ module.exports = require('spawnpoint').registerPlugin({
 			throw new Error('No port, host, or file set to listen');
 		}
 		// track clients to gracefully close server
-		const clients = {},
-			requests = {};
+		const clients = {};
+		const requests = {};
 		app[serverNS].on('error', function(err){
 			app.error('HTTP server error').debug(err);
 		});

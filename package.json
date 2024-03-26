@@ -1,41 +1,42 @@
 {
 	"name": "spawnpoint-express",
-	"version": "3.0.2",
+	"version": "4.0.0",
 	"description": "Express plugin for Spawnpoint framework",
-	"main": "spawnpoint-express.js",
-	"scripts": {
-		"test": "npm run lint",
-		"lint": "eslint .",
-		"lint:fix": "eslint . --fix",
-		"precommit": "lint"
+	"keywords": [
+		"express",
+		"appframe"
+	],
+	"homepage": "https://github.com/nodecraft/spawnpoint-express#readme",
+	"bugs": {
+		"url": "https://github.com/nodecraft/spawnpoint-express/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/nodecraft/spawnpoint-express.git"
 	},
-	"keywords": [
-		"express",
-		"appframe"
-	],
-	"author": "Nodecraft Inc.",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/nodecraft/spawnpoint-express/issues"
+	"author": "Nodecraft Inc.",
+	"main": "spawnpoint-express.js",
+	"scripts": {
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"precommit": "lint",
+		"test": "npm run lint"
 	},
-	"homepage": "https://github.com/nodecraft/spawnpoint-express#readme",
 	"dependencies": {
-		"spawnpoint": "*",
-		"body-parser": "^1.19.0",
+		"body-parser": "^1.20.2",
 		"compression": "^1.7.4",
-		"express": "^4.17.1",
-		"helmet": "^4.2.0",
-		"joi": "^17.3.0",
-		"lodash": "^4.17.20"
+		"express": "^4.19.2",
+		"helmet": "^7.1.0",
+		"joi": "^17.12.2",
+		"lodash": "^4.17.21",
+		"spawnpoint": "*"
 	},
 	"devDependencies": {
-		"eslint": "^7.16.0",
-		"eslint-config-nodecraft": "^6.2.0",
-		"eslint-plugin-json": "^2.1.2",
-		"eslint-plugin-node": "^11.1.0"
+		"@nodecraft/eslint-config": "^34.0.1",
+		"eslint": "^8.57.0",
+		"eslint-plugin-json": "^3.1.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-unicorn": "^51.0.1"
 	}
 }

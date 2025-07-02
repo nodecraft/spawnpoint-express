@@ -118,7 +118,10 @@ module.exports = require('spawnpoint').registerPlugin({
 				fs.unlinkSync(config.file);
 			}
 			const mask = process.umask(0);
-			app[serverNS].listen(config.file, function() {
+			app[serverNS].listen({
+				path: config.file,
+				backlog: config.backlog || 511,
+			}, function() {
 				process.umask(mask);
 				ready();
 			});

@@ -40,6 +40,17 @@ module.exports = require('spawnpoint').registerPlugin({
 		};
 		app[appNS].response.fail = function(error, data) {
 			let response = app.code('express.generic_error');
+
+			// RethinkDB driver errors carry internal query details, so they never reach the client
+			const isReqlError = error?.name?.startsWith?.('Reql') || error?.message?.startsWith?.('Cannot perform read:');
+			if (isReqlError) {
+				app.error('RethinkDB Error', error);
+				this.status(500);
+				response.success = false;
+				response.error = true;
+				return this.json(response);
+			}
+
 			const checkError = app.maskErrorToCode(error);
 			if (checkError !== false) {
 				response = checkError;
@@ -236,16 +247,17 @@ module.exports = require('spawnpoint').registerPlugin({
 						data[type] = req[type];
 					}
 				}
-				let results = null;
-				const errors = {};
+				// joi.assert() returns nothing and reads a null message slot as the options, so validate() is used directly
+				let result = null;
 				try {
-					results = app.joi.assert(data, schema, null, options);
+					result = schema.validate(data, options);
 				} catch (err) {
-					if (err.name !== 'ValidationError' || !err.details) {
-						app.debug('Caught unknown JOI error when validating against schema', err);
-						return res.status(400).fail('express.validation');
-					}
-					for (const item of err.details) {
+					app.debug('Caught unknown JOI error when validating against schema', err);
+					return res.status(400).fail('express.validation');
+				}
+				if (result.error) {
+					const errors = {};
+					for (const item of result.error.details) {
 						const name = fieldRegex.exec(item.path.join('.'));
 						if (name && name[1] && name[2]) {
 							errors[name[2]] = {
@@ -259,7 +271,7 @@ module.exports = require('spawnpoint').registerPlugin({
 					});
 				}
 				// passed validation
-				_.each(results, function(value, key) {
+				_.each(result.value, function(value, key) {
 					req[key] = value;
 				});
 				return next();
@@ -269,8 +281,12 @@ module.exports = require('spawnpoint').registerPlugin({
 			res.invalid = function(fields) {
 				const errors = {};
 				_.each(fields, function(message, field) {
+					let text = message;
+					if (message && typeof(message) === 'object') {
+						text = message.message;
+					}
 					errors[field] = {
-						message: typeof(message) === 'object' ? message.message : message,
+						message: text,
 						type: 'custom_message',
 					};
 				});
